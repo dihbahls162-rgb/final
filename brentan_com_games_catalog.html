@@ -1,0 +1,1407 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>brentan.com - Free Online Games | Play on Poki Style Hub</title>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        poki: {
+                            bg: '#0b1120',
+                            card: '#162032',
+                            cardHover: '#1e2d47',
+                            cyan: '#00d2ff',
+                            purple: '#8b5cf6',
+                            pink: '#ec4899',
+                            orange: '#f97316',
+                            green: '#10b981',
+                            yellow: '#eab308'
+                        }
+                    },
+                    fontFamily: {
+                        poki: ['Fredoka', 'Nunito', 'sans-serif']
+                    }
+                }
+            }
+        }
+    </script>
+    
+    <!-- Icons & Typography -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600;700&family=Nunito:wght@700;800;900&display=swap" rel="stylesheet">
+
+    <style>
+        body {
+            font-family: 'Fredoka', 'Nunito', sans-serif;
+            background-color: #0b1120;
+            color: #f8fafc;
+            touch-action: manipulation;
+            user-select: none;
+            overflow-x: hidden;
+        }
+
+        .poki-tile {
+            transition: transform 0.22s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.22s ease, border-color 0.2s ease;
+            cursor: pointer;
+        }
+
+        .poki-tile:hover {
+            transform: translateY(-6px) scale(1.02);
+            box-shadow: 0 16px 30px -6px rgba(0, 210, 255, 0.35), 0 10px 15px -5px rgba(0, 0, 0, 0.7);
+        }
+
+        .poki-badge {
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
+        }
+
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #0b1120;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #1e2d47;
+            border-radius: 9999px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #00d2ff;
+        }
+
+        canvas {
+            display: block;
+            touch-action: none;
+        }
+
+        .no-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .no-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+
+        @keyframes pulseGlow {
+            0%, 100% { box-shadow: 0 0 15px rgba(0, 210, 255, 0.4); }
+            50% { box-shadow: 0 0 25px rgba(0, 210, 255, 0.8); }
+        }
+        .pulse-glow {
+            animation: pulseGlow 2.5s infinite ease-in-out;
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col justify-between antialiased selection:bg-cyan-400 selection:text-slate-950">
+
+    <div id="publish-banner" class="bg-gradient-to-r from-cyan-600 via-blue-600 to-purple-600 text-white px-4 py-2.5 text-xs font-bold border-b border-cyan-400/30">
+        <div class="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-2">
+            <div class="flex items-center gap-2">
+                <span class="bg-white/20 px-2 py-0.5 rounded-full text-[10px] uppercase font-black tracking-wider">Publication Ready</span>
+                <span class="truncate">🚀 <strong>brentan.com</strong> is live and optimized for Chromebooks, PCs, and Touch devices!</span>
+            </div>
+            <div class="flex items-center gap-2 shrink-0">
+                <button onclick="openPublishModal()" class="px-3 py-1 bg-slate-950/80 hover:bg-slate-950 text-cyan-300 rounded-lg border border-cyan-400/50 flex items-center gap-1.5 transition">
+                    <i class="fa-solid fa-cloud-arrow-up text-cyan-400"></i> Deploy / Custom Domain
+                </button>
+                <button onclick="copyShareableLink()" class="px-3 py-1 bg-white hover:bg-slate-100 text-slate-950 rounded-lg flex items-center gap-1.5 shadow transition">
+                    <i class="fa-solid fa-share-nodes text-blue-600"></i> Copy Share Link
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <header class="sticky top-0 z-40 bg-slate-900/95 backdrop-blur-md border-b border-slate-800/80 px-4 py-3">
+        <div class="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-3">
+            
+            <!-- Branding Logo -->
+            <div class="flex items-center justify-between w-full md:w-auto">
+                <a href="#" onclick="showCatalog()" class="flex items-center space-x-3 group">
+                    <div class="bg-gradient-to-tr from-cyan-400 via-blue-600 to-purple-600 p-2.5 rounded-2xl shadow-lg shadow-cyan-500/25 group-hover:rotate-6 transition duration-300">
+                        <i class="fa-solid fa-gamepad text-slate-950 text-2xl"></i>
+                    </div>
+                    <div>
+                        <span class="text-2xl sm:text-3xl font-black tracking-wide text-white group-hover:text-cyan-400 transition">
+                            brentan<span class="text-cyan-400 font-black">.com</span>
+                        </span>
+                        <span class="block text-[10px] uppercase font-bold tracking-widest text-slate-400">Free Poki-Style Online Arcade</span>
+                    </div>
+                </a>
+
+                <!-- Mobile Quick Audio Toggle -->
+                <div class="flex md:hidden items-center space-x-2">
+                    <button onclick="toggleAudio()" class="p-2 bg-slate-800 rounded-xl text-amber-400 border border-slate-700">
+                        <i id="mobile-audio-icon" class="fa-solid fa-volume-high"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Live Search Bar -->
+            <div class="relative w-full md:max-w-md">
+                <i class="fa-solid fa-magnifying-glass absolute left-4 top-1/2 -translate-y-1/2 text-slate-400"></i>
+                <input type="text" id="searchInput" oninput="filterGames()" placeholder="Search Basketball, Space Dodge, Retro Bowl, Subway Surfers..."
+                       class="w-full bg-slate-950 border-2 border-slate-800 focus:border-cyan-400 focus:ring-4 focus:ring-cyan-500/20 rounded-2xl py-2.5 pl-11 pr-10 text-sm font-semibold text-slate-100 placeholder-slate-500 transition outline-none">
+                <button id="clearSearchBtn" onclick="clearSearch()" class="hidden absolute right-3 top-1/2 -translate-y-1/2 text-slate-500 hover:text-white">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+
+            <!-- Chromebook & Sound Controls -->
+            <div class="hidden md:flex items-center space-x-3">
+                <button id="btn-touch-toggle" onclick="toggleTouchControls()" class="px-3.5 py-2 bg-slate-800 hover:bg-slate-700 border border-slate-700 rounded-xl text-xs font-bold text-slate-200 flex items-center gap-2 transition shadow-sm">
+                    <i class="fa-solid fa-mobile-screen text-cyan-400"></i>
+                    <span id="touch-toggle-text">Touch Controls: ON</span>
+                </button>
+                <button onclick="toggleAudio()" class="px-3.5 py-2 bg-slate-800 hover:bg-slate-700 border border-slate-700 rounded-xl text-xs font-bold text-slate-200 flex items-center gap-2 transition shadow-sm">
+                    <i id="audio-icon" class="fa-solid fa-volume-high text-amber-400"></i>
+                    <span id="audio-text">Sound: ON</span>
+                </button>
+            </div>
+        </div>
+
+        <!-- Poki Category Pills Navigation -->
+        <div class="max-w-7xl mx-auto mt-3 flex items-center gap-2 overflow-x-auto pb-1 no-scrollbar">
+            <button onclick="filterCategory('all', this)" class="cat-pill active px-4 py-1.5 rounded-full text-xs font-bold whitespace-nowrap transition bg-cyan-400 text-slate-950 shadow-md shadow-cyan-500/20">
+                <i class="fa-solid fa-border-all mr-1"></i> All Games
+            </button>
+            <button onclick="filterCategory('popular', this)" class="cat-pill px-4 py-1.5 rounded-full text-xs font-bold whitespace-nowrap transition bg-slate-800 text-slate-300 hover:bg-slate-700 hover:text-white">
+                <i class="fa-solid fa-fire mr-1 text-orange-500"></i> Popular Hits
+            </button>
+            <button onclick="filterCategory('basketball', this)" class="cat-pill px-4 py-1.5 rounded-full text-xs font-bold whitespace-nowrap transition bg-slate-800 text-slate-300 hover:bg-slate-700 hover:text-white">
+                <i class="fa-solid fa-basketball mr-1 text-orange-400"></i> Basketball Stars
+            </button>
+            <button onclick="filterCategory('sports', this)" class="cat-pill px-4 py-1.5 rounded-full text-xs font-bold whitespace-nowrap transition bg-slate-800 text-slate-300 hover:bg-slate-700 hover:text-white">
+                <i class="fa-solid fa-football mr-1 text-amber-400"></i> Sports & Football
+            </button>
+            <button onclick="filterCategory('action', this)" class="cat-pill px-4 py-1.5 rounded-full text-xs font-bold whitespace-nowrap transition bg-slate-800 text-slate-300 hover:bg-slate-700 hover:text-white">
+                <i class="fa-solid fa-person-running mr-1 text-cyan-400"></i> Action & Space
+            </button>
+            <button onclick="filterCategory('driving', this)" class="cat-pill px-4 py-1.5 rounded-full text-xs font-bold whitespace-nowrap transition bg-slate-800 text-slate-300 hover:bg-slate-700 hover:text-white">
+                <i class="fa-solid fa-truck-monster mr-1 text-yellow-400"></i> Driving
+            </button>
+            <button onclick="filterCategory('arcade', this)" class="cat-pill px-4 py-1.5 rounded-full text-xs font-bold whitespace-nowrap transition bg-slate-800 text-slate-300 hover:bg-slate-700 hover:text-white">
+                <i class="fa-solid fa-rocket mr-1 text-emerald-400"></i> Arcade Classics
+            </button>
+            <button onclick="filterCategory('favorites', this)" class="cat-pill px-4 py-1.5 rounded-full text-xs font-bold whitespace-nowrap transition bg-slate-800 text-slate-300 hover:bg-slate-700 hover:text-white">
+                <i class="fa-solid fa-heart mr-1 text-pink-500"></i> Favorites (<span id="fav-count">0</span>)
+            </button>
+        </div>
+    </header>
+
+    <main id="catalog-view" class="max-w-7xl mx-auto w-full px-4 py-6 flex-grow">
+        
+        <!-- Hero Header Bar -->
+        <div class="mb-6 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 border-b border-slate-800 pb-4">
+            <div>
+                <h1 class="text-2xl sm:text-4xl font-black tracking-tight text-white flex items-center gap-3">
+                    <span>Play Poki Games on brentan.com</span>
+                    <span class="text-xs bg-cyan-500/10 border border-cyan-500/30 text-cyan-400 px-3 py-1 rounded-full uppercase tracking-wider font-extrabold">Chromebook Ready</span>
+                </h1>
+                <p class="text-xs sm:text-sm text-slate-400 mt-1">Instant-play web games with zero installs, keyboard, trackpad, and touch support.</p>
+            </div>
+            <div id="catalog-count-badge" class="text-xs font-bold text-slate-400 bg-slate-900 border border-slate-800 px-3 py-1.5 rounded-xl">
+                Showing <span id="game-count-num" class="text-cyan-400 font-extrabold">12</span> Games
+            </div>
+        </div>
+
+        <!-- Poki-style Masonry Dynamic Grid -->
+        <div id="game-grid" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4 auto-rows-[165px]">
+            <!-- Dynamic Poki Tiles Rendered Here -->
+        </div>
+
+        <!-- No Results Fallback -->
+        <div id="no-results" class="hidden text-center py-16 bg-slate-900/50 rounded-3xl border border-slate-800">
+            <i class="fa-solid fa-ghost text-5xl text-slate-600 mb-4 block"></i>
+            <h3 class="text-xl font-bold text-slate-200">No matching Poki games found</h3>
+            <p class="text-xs text-slate-400 mt-1">Try searching for "Basketball Stars", "Space Dodge", or "Retro Bowl".</p>
+            <button onclick="clearSearch()" class="mt-4 px-4 py-2 bg-cyan-400 text-slate-950 font-bold rounded-xl text-xs hover:bg-cyan-300 transition">Clear Search</button>
+        </div>
+    </main>
+
+    <div id="player-view" class="hidden max-w-7xl mx-auto w-full px-2 sm:px-4 py-4 flex-grow flex flex-col gap-4">
+        
+        <!-- Player Header Toolbar -->
+        <div class="flex items-center justify-between bg-slate-900 border border-slate-800 p-3 rounded-2xl shadow-lg">
+            <button onclick="showCatalog()" class="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-cyan-400 font-bold rounded-xl text-xs sm:text-sm flex items-center gap-2 border border-slate-700 transition">
+                <i class="fa-solid fa-arrow-left"></i>
+                <span>Back to Catalog</span>
+            </button>
+
+            <!-- Active Game Header Info -->
+            <div class="flex items-center gap-3">
+                <span id="player-game-icon" class="text-2xl">🏀</span>
+                <div>
+                    <h2 id="player-game-title" class="text-base sm:text-xl font-black text-white leading-tight">Basketball Stars</h2>
+                    <span id="player-game-tag" class="text-[10px] text-cyan-400 font-bold uppercase tracking-wider">Playable Arcade Engine • brentan.com</span>
+                </div>
+            </div>
+
+            <!-- Header Action Controls -->
+            <div class="flex items-center space-x-2">
+                <button id="btn-fav" onclick="toggleFavoriteCurrentGame()" class="px-3 py-2 bg-slate-800 hover:bg-slate-700 text-pink-500 border border-slate-700 rounded-xl text-xs font-bold flex items-center gap-1.5 transition">
+                    <i id="fav-icon" class="fa-regular fa-heart"></i>
+                    <span class="hidden sm:inline">Like</span>
+                </button>
+                <button onclick="toggleFullscreen()" class="px-3 py-2 bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 rounded-xl text-xs font-bold flex items-center gap-1.5 transition">
+                    <i class="fa-solid fa-expand text-cyan-400"></i>
+                    <span class="hidden sm:inline">Fullscreen</span>
+                </button>
+            </div>
+        </div>
+
+        <!-- Main Screen Grid Layout -->
+        <div class="grid grid-cols-1 lg:grid-cols-4 gap-4 items-start">
+            
+            <!-- Game Frame Container (3 Columns Desktop) -->
+            <div class="lg:col-span-3 flex flex-col gap-3">
+                
+                <!-- Basketball Game Options Bar -->
+                <div id="basketball-options" class="bg-slate-900 border border-slate-800 rounded-xl p-2.5 flex flex-wrap items-center justify-between gap-2 text-xs">
+                    <div class="flex items-center gap-1.5 flex-wrap">
+                        <span class="text-slate-400 font-bold uppercase tracking-wider text-[11px]">Mode:</span>
+                        <button onclick="setBBMode('practice')" id="bb-mode-practice" class="px-3 py-1 rounded-lg border border-cyan-400 bg-cyan-500/20 text-cyan-400 font-bold">Practice</button>
+                        <button onclick="setBBMode('3point')" id="bb-mode-3point" class="px-3 py-1 rounded-lg border border-slate-800 bg-slate-950 text-slate-400 font-bold hover:border-slate-700">3-Point Contest</button>
+                    </div>
+
+                    <div class="flex items-center gap-3 text-slate-200 font-mono">
+                        <div>SCORE: <span id="bb-score" class="text-amber-400 font-bold">00</span></div>
+                        <div>HIGH: <span id="bb-highscore" class="text-cyan-400 font-bold">00</span></div>
+                        <button onclick="resetBBBall()" class="px-2.5 py-1 bg-amber-500/20 text-amber-400 border border-amber-500/40 rounded-lg font-sans text-xs hover:bg-amber-500/30 font-bold">
+                            Reset Ball (S)
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Live HTML5 Canvas Display Window -->
+                <div id="game-frame-container" class="relative w-full bg-slate-950 border-2 border-slate-800 rounded-2xl overflow-hidden shadow-2xl aspect-[16/9] min-h-[380px] max-h-[600px] flex items-center justify-center">
+                    
+                    <canvas id="gameCanvas" class="w-full h-full"></canvas>
+
+                    <!-- Poki Game Launcher Overlay -->
+                    <div id="game-start-overlay" class="absolute inset-0 bg-slate-950/90 backdrop-blur-md flex flex-col items-center justify-center p-6 text-center z-20">
+                        <div class="bg-gradient-to-r from-cyan-400 to-blue-600 text-slate-950 text-xs px-3.5 py-1 rounded-full font-black uppercase tracking-wider mb-3">
+                            brentan.com ARCADE PORTAL
+                        </div>
+                        <h2 id="overlay-game-title" class="text-3xl sm:text-5xl font-black text-white mb-2">BASKETBALL STARS</h2>
+                        <p id="overlay-game-desc" class="text-slate-300 text-xs sm:text-sm max-w-md mb-6 leading-relaxed">
+                            Shoot, jump, and score in this classic Poki basketball hit! Use WASD or Arrow Keys to move, and hold Spacebar to charge your shot meter.
+                        </p>
+                        <button onclick="startGameInstance()" class="pulse-glow bg-gradient-to-r from-cyan-400 via-blue-500 to-cyan-400 hover:from-cyan-300 hover:to-blue-400 text-slate-950 text-sm sm:text-base px-8 py-3.5 rounded-2xl font-black shadow-lg transform hover:scale-105 active:scale-95 transition">
+                            PLAY NOW
+                        </button>
+                    </div>
+
+                    <!-- Chromebook Virtual Touch Overlay Controls -->
+                    <div id="touch-controls-overlay" class="absolute inset-x-0 bottom-0 p-4 flex justify-between items-end pointer-events-none z-10">
+                        <div class="flex gap-2 pointer-events-auto">
+                            <button id="btn-touch-left" class="w-14 h-14 bg-slate-900/85 active:bg-cyan-400/80 border-2 border-slate-700 active:border-cyan-300 text-white text-2xl rounded-2xl flex items-center justify-center shadow-lg backdrop-blur-sm">
+                                <i class="fa-solid fa-arrow-left"></i>
+                            </button>
+                            <button id="btn-touch-right" class="w-14 h-14 bg-slate-900/85 active:bg-cyan-400/80 border-2 border-slate-700 active:border-cyan-300 text-white text-2xl rounded-2xl flex items-center justify-center shadow-lg backdrop-blur-sm">
+                                <i class="fa-solid fa-arrow-right"></i>
+                            </button>
+                        </div>
+
+                        <div class="pointer-events-auto mb-1">
+                            <button id="btn-touch-reset" class="px-3.5 py-2 bg-slate-900/85 active:bg-amber-500/80 border border-slate-700 active:border-amber-400 text-amber-400 active:text-slate-950 text-xs font-bold rounded-xl shadow-md backdrop-blur-sm">
+                                <i class="fa-solid fa-rotate-left"></i> RESET
+                            </button>
+                        </div>
+
+                        <div class="pointer-events-auto">
+                            <button id="btn-touch-action" class="w-16 h-16 sm:w-20 sm:h-20 bg-gradient-to-tr from-cyan-400 to-blue-500 active:from-cyan-300 active:to-blue-400 text-slate-950 font-black text-xs uppercase rounded-2xl flex flex-col items-center justify-center shadow-xl border-2 border-cyan-300 backdrop-blur-sm">
+                                <i id="touch-action-icon" class="fa-solid fa-basketball text-lg mb-0.5"></i>
+                                <span id="touch-action-text">ACTION</span>
+                            </button>
+                        </div>
+                    </div>
+
+                </div>
+
+                <!-- Control Instructions Card -->
+                <div class="bg-slate-900 border border-slate-800 rounded-2xl p-4">
+                    <h3 class="text-sm font-bold text-slate-300 mb-2 uppercase tracking-wider flex items-center gap-2">
+                        <i class="fa-solid fa-keyboard text-cyan-400"></i> Game Controls (Chromebook & Keyboard)
+                    </h3>
+                    <div id="game-controls-guide" class="grid grid-cols-2 sm:grid-cols-4 gap-2 text-xs text-slate-300">
+                        <div class="bg-slate-950 p-2.5 rounded-xl border border-slate-800">
+                            <span class="text-cyan-400 font-bold block">MOVE / AIM</span>
+                            <span class="text-slate-400">A / D or Arrow Keys</span>
+                        </div>
+                        <div class="bg-slate-950 p-2.5 rounded-xl border border-slate-800">
+                            <span class="text-cyan-400 font-bold block">JUMP / SHOOT</span>
+                            <span class="text-slate-400">Spacebar / Up Arrow</span>
+                        </div>
+                        <div class="bg-slate-950 p-2.5 rounded-xl border border-slate-800">
+                            <span class="text-cyan-400 font-bold block">RESPAWN BALL</span>
+                            <span class="text-slate-400">S Key / On-screen Reset</span>
+                        </div>
+                        <div class="bg-slate-950 p-2.5 rounded-xl border border-slate-800">
+                            <span class="text-cyan-400 font-bold block">TOUCH CONTROL</span>
+                            <span class="text-slate-400">Virtual Buttons Active</span>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- Recommended Poki Sidebar (1 Column Desktop) -->
+            <div class="lg:col-span-1 bg-slate-900 border border-slate-800 rounded-2xl p-4 flex flex-col gap-3">
+                <h3 class="text-sm font-bold text-white uppercase tracking-wider flex items-center gap-2">
+                    <i class="fa-solid fa-fire text-orange-500"></i> Top Poki Games
+                </h3>
+                <div id="recommended-sidebar" class="flex flex-col gap-2.5">
+                    <!-- Dynamic Poki sidebar cards -->
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <div id="publish-modal" class="hidden fixed inset-0 bg-slate-950/80 backdrop-blur-md z-50 flex items-center justify-center p-4">
+        <div class="bg-slate-900 border border-slate-800 rounded-3xl max-w-xl w-full p-6 relative shadow-2xl">
+            <button onclick="closePublishModal()" class="absolute top-4 right-4 text-slate-400 hover:text-white text-xl">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+            <div class="flex items-center gap-3 mb-4">
+                <div class="bg-cyan-500/20 text-cyan-400 p-3 rounded-2xl border border-cyan-500/30">
+                    <i class="fa-solid fa-globe text-2xl"></i>
+                </div>
+                <div>
+                    <h3 class="text-xl font-black text-white">Publishing brentan.com</h3>
+                    <p class="text-xs text-slate-400">Deployment and Hosting Options</p>
+                </div>
+            </div>
+
+            <div class="space-y-4 text-xs text-slate-300">
+                <div class="bg-slate-950 p-4 rounded-2xl border border-slate-800">
+                    <h4 class="font-bold text-cyan-400 mb-1"><i class="fa-solid fa-check-circle mr-1"></i> Option 1: Vercel / Netlify / GitHub Pages</h4>
+                    <p class="text-slate-400">Upload this single single-file HTML directly to GitHub, Vercel, or Netlify, and connect the custom domain <strong>brentan.com</strong> in your domain settings.</p>
+                </div>
+
+                <div class="bg-slate-950 p-4 rounded-2xl border border-slate-800">
+                    <h4 class="font-bold text-amber-400 mb-1"><i class="fa-solid fa-link mr-1"></i> Option 2: Live Embed / Shareable Link</h4>
+                    <p class="text-slate-400 mb-2">Use the button below to generate a direct shareable preview link or copy the full raw web code.</p>
+                    <button onclick="copyShareableLink()" class="w-full py-2 bg-gradient-to-r from-cyan-400 to-blue-500 text-slate-950 font-black rounded-xl hover:opacity-90 transition">
+                        Copy Shareable Website URL
+                    </button>
+                </div>
+            </div>
+
+            <div class="mt-6 flex justify-end">
+                <button onclick="closePublishModal()" class="px-5 py-2 bg-slate-800 hover:bg-slate-700 text-white font-bold rounded-xl text-xs">
+                    Close
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <footer class="mt-12 bg-slate-950 border-t border-slate-800 py-8 px-4 text-slate-400 text-xs">
+        <div class="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-4">
+            <div class="flex items-center space-x-3">
+                <div class="bg-cyan-500/20 text-cyan-400 p-2 rounded-xl border border-cyan-500/30">
+                    <i class="fa-solid fa-gamepad text-lg"></i>
+                </div>
+                <div>
+                    <span class="text-lg font-black text-white">brentan<span class="text-cyan-400">.com</span></span>
+                    <p class="text-[11px] text-slate-500">Free interactive online games styled after Poki.</p>
+                </div>
+            </div>
+            <div class="flex flex-wrap items-center justify-center gap-6 text-slate-400 font-semibold">
+                <a href="#" onclick="filterCategory('all')" class="hover:text-cyan-400 transition">All Games</a>
+                <a href="#" onclick="filterCategory('basketball')" class="hover:text-cyan-400 transition">Basketball Stars</a>
+                <a href="#" onclick="filterCategory('action')" class="hover:text-cyan-400 transition">Space Dodge</a>
+                <a href="#" onclick="filterCategory('sports')" class="hover:text-cyan-400 transition">Retro Bowl</a>
+                <a href="#" onclick="openPublishModal()" class="hover:text-cyan-400 transition">Publish</a>
+            </div>
+            <div class="text-slate-500 font-mono text-[11px]">
+                &copy; 2026 brentan.com • Poki Edition
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        class SoundEngine {
+            constructor() {
+                this.ctx = null;
+                this.enabled = true;
+            }
+
+            init() {
+                if (!this.ctx) {
+                    const AudioCtx = window.AudioContext || window.webkitAudioContext;
+                    this.ctx = new AudioCtx();
+                }
+            }
+
+            playBounce() {
+                if (!this.enabled) return;
+                this.init();
+                const osc = this.ctx.createOscillator();
+                const gain = this.ctx.createGain();
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(150, this.ctx.currentTime);
+                osc.frequency.exponentialRampToValueAtTime(35, this.ctx.currentTime + 0.08);
+                gain.gain.setValueAtTime(0.3, this.ctx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.01, this.ctx.currentTime + 0.08);
+                osc.connect(gain);
+                gain.connect(this.ctx.destination);
+                osc.start();
+                osc.stop(this.ctx.currentTime + 0.08);
+            }
+
+            playSwish() {
+                if (!this.enabled) return;
+                this.init();
+                const bufferSize = this.ctx.sampleRate * 0.18;
+                const buffer = this.ctx.createBuffer(1, bufferSize, this.ctx.sampleRate);
+                const data = buffer.getChannelData(0);
+                for (let i = 0; i < bufferSize; i++) data[i] = Math.random() * 2 - 1;
+
+                const noise = this.ctx.createBufferSource();
+                noise.buffer = buffer;
+                const filter = this.ctx.createBiquadFilter();
+                filter.type = 'bandpass';
+                filter.frequency.value = 1500;
+                filter.Q.value = 3;
+                const gain = this.ctx.createGain();
+                gain.gain.setValueAtTime(0.4, this.ctx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.01, this.ctx.currentTime + 0.18);
+
+                noise.connect(filter);
+                filter.connect(gain);
+                gain.connect(this.ctx.destination);
+                noise.start();
+            }
+
+            playRim() {
+                if (!this.enabled) return;
+                this.init();
+                const osc = this.ctx.createOscillator();
+                const gain = this.ctx.createGain();
+                osc.type = 'triangle';
+                osc.frequency.setValueAtTime(420, this.ctx.currentTime);
+                osc.frequency.exponentialRampToValueAtTime(90, this.ctx.currentTime + 0.1);
+                gain.gain.setValueAtTime(0.5, this.ctx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.01, this.ctx.currentTime + 0.1);
+                osc.connect(gain);
+                gain.connect(this.ctx.destination);
+                osc.start();
+                osc.stop(this.ctx.currentTime + 0.1);
+            }
+
+            playScore() {
+                if (!this.enabled) return;
+                this.init();
+                const osc = this.ctx.createOscillator();
+                const gain = this.ctx.createGain();
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(523.25, this.ctx.currentTime);
+                osc.frequency.setValueAtTime(659.25, this.ctx.currentTime + 0.08);
+                gain.gain.setValueAtTime(0.3, this.ctx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.01, this.ctx.currentTime + 0.2);
+                osc.connect(gain);
+                gain.connect(this.ctx.destination);
+                osc.start();
+                osc.stop(this.ctx.currentTime + 0.2);
+            }
+        }
+
+        const audio = new SoundEngine();
+
+        function toggleAudio() {
+            audio.enabled = !audio.enabled;
+            const text = document.getElementById('audio-text');
+            const icon = document.getElementById('audio-icon');
+            const mIcon = document.getElementById('mobile-audio-icon');
+            
+            if (audio.enabled) {
+                if (text) text.innerText = 'Sound: ON';
+                if (icon) icon.className = 'fa-solid fa-volume-high text-amber-400';
+                if (mIcon) mIcon.className = 'fa-solid fa-volume-high';
+            } else {
+                if (text) text.innerText = 'Sound: OFF';
+                if (icon) icon.className = 'fa-solid fa-volume-xmark text-slate-500';
+                if (mIcon) mIcon.className = 'fa-solid fa-volume-xmark';
+            }
+        }
+
+        function toggleTouchControls() {
+            const touchOverlay = document.getElementById('touch-controls-overlay');
+            const text = document.getElementById('touch-toggle-text');
+            if (touchOverlay.classList.contains('hidden')) {
+                touchOverlay.classList.remove('hidden');
+                text.innerText = 'Touch Controls: ON';
+            } else {
+                touchOverlay.classList.add('hidden');
+                text.innerText = 'Touch Controls: OFF';
+            }
+        }
+
+        function openPublishModal() {
+            document.getElementById('publish-modal').classList.remove('hidden');
+        }
+
+        function closePublishModal() {
+            document.getElementById('publish-modal').classList.add('hidden');
+        }
+
+        function copyShareableLink() {
+            const temp = document.createElement('input');
+            temp.value = window.location.href;
+            document.body.appendChild(temp);
+            temp.select();
+            document.execCommand('copy');
+            document.body.removeChild(temp);
+            alert('brentan.com share URL copied to clipboard!');
+        }
+
+        const pokiGamesDatabase = [
+            {
+                id: 'basketball-stars',
+                title: 'Basketball Stars',
+                category: 'basketball',
+                categories: ['basketball', 'sports', 'popular'],
+                badge: 'FEATURED',
+                badgeBg: 'bg-gradient-to-r from-orange-500 to-red-500 text-slate-950',
+                rating: '4.9',
+                players: '32.4M',
+                icon: '🏀',
+                bgGradient: 'from-orange-600/90 to-slate-900',
+                span: 'col-span-2 row-span-2', // Poki Hero Tile
+                desc: 'Jump, shoot 3-pointers, and score in Basketball Stars! Use WASD or Arrow keys to move and hold Spacebar for perfect shot timing.'
+            },
+            {
+                id: 'space-dodge',
+                title: 'Space Dodge',
+                category: 'action',
+                categories: ['action', 'arcade', 'popular'],
+                badge: 'HOT',
+                badgeBg: 'bg-gradient-to-r from-cyan-400 to-blue-500 text-slate-950',
+                rating: '4.8',
+                players: '21.5M',
+                icon: '🚀',
+                bgGradient: 'from-blue-600/90 to-slate-900',
+                span: 'col-span-1 row-span-1',
+                desc: 'Piloting your spaceship through dense asteroid fields! Collect energy crystals and test your fast reflexes.'
+            },
+            {
+                id: 'retro-bowl',
+                title: 'Retro Bowl',
+                category: 'sports',
+                categories: ['sports', 'popular'],
+                badge: 'RETRO',
+                badgeBg: 'bg-gradient-to-r from-amber-500 to-orange-600 text-slate-950',
+                rating: '4.9',
+                players: '18.7M',
+                icon: '🏈',
+                bgGradient: 'from-amber-700/90 to-slate-900',
+                span: 'col-span-1 row-span-1',
+                desc: 'Pass like a championship quarterback! Aim your pass trajectory and hit moving wide receivers in stride.'
+            },
+            {
+                id: 'penalty-shootout',
+                title: 'Penalty Shootout',
+                category: 'sports',
+                categories: ['sports'],
+                badge: 'SOCCER',
+                badgeBg: 'bg-gradient-to-r from-emerald-400 to-green-500 text-slate-950',
+                rating: '4.7',
+                players: '15.2M',
+                icon: '⚽',
+                bgGradient: 'from-emerald-700/90 to-slate-900',
+                span: 'col-span-1 row-span-1',
+                desc: 'Aim your penalty shot past the goalkeeper! Time your direction meter and strike for the top corner.'
+            },
+            {
+                id: 'subway-surfers',
+                title: 'Subway Surfers',
+                category: 'action',
+                categories: ['action', 'popular'],
+                badge: 'CLASSIC',
+                badgeBg: 'bg-gradient-to-r from-pink-500 to-purple-500 text-white',
+                rating: '4.9',
+                players: '45.2M',
+                icon: '🏃',
+                bgGradient: 'from-purple-600/90 to-slate-900',
+                span: 'col-span-1 row-span-1',
+                desc: 'Dash through subway tracks, dodge oncoming trains, and collect coins in this endless runner favorite.'
+            },
+            {
+                id: 'drive-mad',
+                title: 'Drive Mad',
+                category: 'driving',
+                categories: ['driving'],
+                badge: 'STUNT',
+                badgeBg: 'bg-gradient-to-r from-yellow-400 to-amber-500 text-slate-950',
+                rating: '4.8',
+                players: '28.1M',
+                icon: '🛻',
+                bgGradient: 'from-amber-600/90 to-slate-900',
+                span: 'col-span-1 row-span-1',
+                desc: 'Drive monster trucks over extreme obstacle courses without breaking your wheels or flipping over.'
+            },
+            {
+                id: 'level-devil',
+                title: 'Level Devil',
+                category: 'arcade',
+                categories: ['arcade', 'action'],
+                badge: 'TROLL',
+                badgeBg: 'bg-gradient-to-r from-red-500 to-rose-600 text-white',
+                rating: '4.7',
+                players: '19.8M',
+                icon: '😈',
+                bgGradient: 'from-red-600/90 to-slate-900',
+                span: 'col-span-1 row-span-1',
+                desc: 'A troll platformer where the floor breaks, spikes move, and doors change position when you get close!'
+            },
+            {
+                id: 'smash-karts',
+                title: 'Smash Karts',
+                category: 'driving',
+                categories: ['driving', 'arcade'],
+                badge: '3D BATTLE',
+                badgeBg: 'bg-gradient-to-r from-purple-500 to-indigo-500 text-white',
+                rating: '4.8',
+                players: '22.5M',
+                icon: '🏎️',
+                bgGradient: 'from-indigo-600/90 to-slate-900',
+                span: 'col-span-1 row-span-1',
+                desc: 'Kart battle arena! Collect surprise power-ups, shoot rockets, and blast rival karts to score points.'
+            },
+            {
+                id: 'monkey-mart',
+                title: 'Monkey Mart',
+                category: 'arcade',
+                categories: ['arcade'],
+                badge: 'POPULAR',
+                badgeBg: 'bg-gradient-to-r from-emerald-400 to-teal-500 text-slate-950',
+                rating: '4.9',
+                players: '38.0M',
+                icon: '🐒',
+                bgGradient: 'from-teal-600/90 to-slate-900',
+                span: 'col-span-1 row-span-1',
+                desc: 'Manage your supermarket as a cute monkey! Plant crops, stack shelves, and upgrade your store.'
+            },
+            {
+                id: 'stickman-hook',
+                title: 'Stickman Hook',
+                category: 'action',
+                categories: ['action'],
+                badge: 'SWING',
+                badgeBg: 'bg-gradient-to-r from-cyan-400 to-blue-400 text-slate-950',
+                rating: '4.7',
+                players: '24.3M',
+                icon: '🧗',
+                bgGradient: 'from-cyan-700/90 to-slate-900',
+                span: 'col-span-1 row-span-1',
+                desc: 'Swing through hundreds of levels using grappling hooks and bouncy trampolines.'
+            }
+        ];
+
+        let favorites = JSON.parse(localStorage.getItem('brentan_favs') || '[]');
+        let currentCategory = 'all';
+        let currentGameId = 'basketball-stars';
+        let gameInstanceRunning = false;
+
+        function updateFavoritesCount() {
+            document.getElementById('fav-count').innerText = favorites.length;
+        }
+        updateFavoritesCount();
+
+        function renderCatalog(games) {
+            const grid = document.getElementById('game-grid');
+            const noResults = document.getElementById('no-results');
+            grid.innerHTML = '';
+
+            if (games.length === 0) {
+                noResults.classList.remove('hidden');
+                document.getElementById('game-count-num').innerText = '0';
+                return;
+            } else {
+                noResults.classList.add('hidden');
+                document.getElementById('game-count-num').innerText = games.length;
+            }
+
+            games.forEach(g => {
+                const isFav = favorites.includes(g.id);
+                const isHero = g.span.includes('col-span-2');
+
+                const card = document.createElement('div');
+                card.className = `poki-tile relative rounded-3xl overflow-hidden bg-gradient-to-br ${g.bgGradient} border-2 border-slate-700/60 p-4 flex flex-col justify-between shadow-xl ${g.span}`;
+                card.onclick = () => openGame(g.id);
+
+                card.innerHTML = `
+                    <div class="flex items-center justify-between z-10">
+                        <span class="poki-badge px-2.5 py-1 rounded-full text-[10px] font-black uppercase tracking-wider ${g.badgeBg}">
+                            ${g.badge}
+                        </span>
+                        <button onclick="event.stopPropagation(); toggleFavorite('${g.id}')" class="w-8 h-8 rounded-full bg-slate-950/60 backdrop-blur-sm flex items-center justify-center text-pink-500 hover:scale-110 transition">
+                            <i class="${isFav ? 'fa-solid' : 'fa-regular'} fa-heart"></i>
+                        </button>
+                    </div>
+
+                    <div class="flex flex-col items-center justify-center my-auto z-10 text-center">
+                        <span class="${isHero ? 'text-6xl sm:text-8xl' : 'text-4xl sm:text-5xl'} transform group-hover:scale-110 transition duration-300 drop-shadow-lg">
+                            ${g.icon}
+                        </span>
+                        <h3 class="${isHero ? 'text-xl sm:text-3xl' : 'text-sm sm:text-base'} font-black text-white mt-2 leading-snug drop-shadow-md">
+                            ${g.title}
+                        </h3>
+                    </div>
+
+                    <div class="flex items-center justify-between text-[11px] font-bold text-slate-200 z-10 bg-slate-950/50 backdrop-blur-sm px-3 py-1.5 rounded-xl border border-white/10">
+                        <div class="flex items-center gap-1 text-amber-400">
+                            <i class="fa-solid fa-star"></i>
+                            <span>${g.rating}</span>
+                        </div>
+                        <div class="flex items-center gap-1 text-slate-300">
+                            <i class="fa-solid fa-user"></i>
+                            <span>${g.players}</span>
+                        </div>
+                    </div>
+                `;
+                grid.appendChild(card);
+            });
+        }
+
+        function filterCategory(cat, el) {
+            currentCategory = cat;
+            document.querySelectorAll('.cat-pill').forEach(btn => {
+                btn.className = 'cat-pill px-4 py-1.5 rounded-full text-xs font-bold whitespace-nowrap transition bg-slate-800 text-slate-300 hover:bg-slate-700 hover:text-white';
+            });
+            if (el) {
+                el.className = 'cat-pill active px-4 py-1.5 rounded-full text-xs font-bold whitespace-nowrap transition bg-cyan-400 text-slate-950 shadow-md shadow-cyan-500/20';
+            }
+            filterGames();
+        }
+
+        function filterGames() {
+            const query = document.getElementById('searchInput').value.toLowerCase().trim();
+            const clearBtn = document.getElementById('clearSearchBtn');
+            if (query.length > 0) clearBtn.classList.remove('hidden');
+            else clearBtn.classList.add('hidden');
+
+            let filtered = pokiGamesDatabase.filter(g => {
+                const matchesSearch = g.title.toLowerCase().includes(query) || g.desc.toLowerCase().includes(query);
+                if (currentCategory === 'all') return matchesSearch;
+                if (currentCategory === 'favorites') return matchesSearch && favorites.includes(g.id);
+                return matchesSearch && g.categories.includes(currentCategory);
+            });
+
+            renderCatalog(filtered);
+        }
+
+        function clearSearch() {
+            document.getElementById('searchInput').value = '';
+            filterGames();
+        }
+
+        function toggleFavorite(id) {
+            if (favorites.includes(id)) {
+                favorites = favorites.filter(favId => favId !== id);
+            } else {
+                favorites.push(id);
+            }
+            localStorage.setItem('brentan_favs', JSON.stringify(favorites));
+            updateFavoritesCount();
+            filterGames();
+            updateFavIconInPlayer();
+        }
+
+        function openGame(gameId) {
+            currentGameId = gameId;
+            const game = pokiGamesDatabase.find(g => g.id === gameId);
+            if (!game) return;
+
+            document.getElementById('catalog-view').classList.add('hidden');
+            document.getElementById('player-view').classList.remove('hidden');
+
+            document.getElementById('player-game-title').innerText = game.title;
+            document.getElementById('player-game-icon').innerText = game.icon;
+            document.getElementById('overlay-game-title').innerText = game.title.toUpperCase();
+            document.getElementById('overlay-game-desc').innerHTML = game.desc;
+
+            const bbOpts = document.getElementById('basketball-options');
+            if (gameId === 'basketball-stars') bbOpts.classList.remove('hidden');
+            else bbOpts.classList.add('hidden');
+
+            renderRecommendedSidebar(gameId);
+            updateFavIconInPlayer();
+
+            document.getElementById('game-start-overlay').classList.remove('hidden');
+            gameInstanceRunning = false;
+            resizeCanvas();
+        }
+
+        function showCatalog() {
+            document.getElementById('player-view').classList.add('hidden');
+            document.getElementById('catalog-view').classList.remove('hidden');
+            gameInstanceRunning = false;
+        }
+
+        function renderRecommendedSidebar(currentId) {
+            const container = document.getElementById('recommended-sidebar');
+            container.innerHTML = '';
+            const recs = pokiGamesDatabase.filter(g => g.id !== currentId);
+
+            recs.slice(0, 6).forEach(g => {
+                const item = document.createElement('div');
+                item.className = 'poki-tile flex items-center gap-3 p-2.5 rounded-xl bg-slate-950 border border-slate-800 hover:border-cyan-400/50 transition cursor-pointer';
+                item.onclick = () => openGame(g.id);
+
+                item.innerHTML = `
+                    <span class="text-3xl">${g.icon}</span>
+                    <div class="flex-grow min-w-0">
+                        <h4 class="text-xs font-bold text-white truncate">${g.title}</h4>
+                        <span class="text-[10px] text-slate-400 block uppercase font-bold">${g.category}</span>
+                    </div>
+                    <span class="text-xs text-amber-400 font-bold"><i class="fa-solid fa-star text-[10px]"></i> ${g.rating}</span>
+                `;
+                container.appendChild(item);
+            });
+        }
+
+        function updateFavIconInPlayer() {
+            const isFav = favorites.includes(currentGameId);
+            const icon = document.getElementById('fav-icon');
+            if (icon) {
+                icon.className = isFav ? 'fa-solid fa-heart text-pink-500' : 'fa-regular fa-heart';
+            }
+        }
+
+        function toggleFavoriteCurrentGame() {
+            toggleFavorite(currentGameId);
+        }
+
+        function toggleFullscreen() {
+            const frame = document.getElementById('game-frame-container');
+            if (!document.fullscreenElement) {
+                frame.requestFullscreen().catch(err => alert("Fullscreen notice: " + err.message));
+            } else {
+                document.exitFullscreen();
+            }
+        }
+
+        const canvas = document.getElementById('gameCanvas');
+        const ctx = canvas.getContext('2d');
+
+        function resizeCanvas() {
+            const rect = canvas.parentElement.getBoundingClientRect();
+            canvas.width = rect.width;
+            canvas.height = rect.height;
+        }
+        window.addEventListener('resize', resizeCanvas);
+
+        const keys = {};
+        window.addEventListener('keydown', (e) => {
+            keys[e.code] = true;
+            if (e.code === 'KeyS' && currentGameId === 'basketball-stars') resetBBBall();
+            if (['Space', 'ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight'].includes(e.code)) {
+                if (document.activeElement === document.body) e.preventDefault();
+            }
+        });
+        window.addEventListener('keyup', (e) => {
+            keys[e.code] = false;
+        });
+
+        const touchBtns = { left: false, right: false, action: false };
+        function setupTouch(id, key) {
+            const btn = document.getElementById(id);
+            btn.addEventListener('pointerdown', (e) => { e.preventDefault(); touchBtns[key] = true; });
+            btn.addEventListener('pointerup', (e) => { e.preventDefault(); touchBtns[key] = false; });
+            btn.addEventListener('pointerleave', (e) => { e.preventDefault(); touchBtns[key] = false; });
+        }
+        setupTouch('btn-touch-left', 'left');
+        setupTouch('btn-touch-right', 'right');
+        setupTouch('btn-touch-action', 'action');
+        document.getElementById('btn-touch-reset').addEventListener('click', () => {
+            if (currentGameId === 'basketball-stars') resetBBBall();
+        });
+
+        const bbState = {
+            mode: 'practice',
+            score: 0,
+            highScore: localStorage.getItem('brentan_bb_high') || 0
+        };
+        document.getElementById('bb-highscore').innerText = String(bbState.highScore).padStart(2, '0');
+
+        class BasketballPlayer {
+            constructor() {
+                this.x = 150;
+                this.y = 0;
+                this.width = 30;
+                this.height = 70;
+                this.vy = 0;
+                this.isJumping = false;
+                this.shotMeter = 0;
+                this.meterCharging = false;
+                this.hasBall = true;
+            }
+
+            reset(x = 150) {
+                this.x = x;
+                this.y = canvas.height - 100 - this.height;
+                this.vy = 0;
+                this.isJumping = false;
+                this.shotMeter = 0;
+                this.meterCharging = false;
+                this.hasBall = true;
+            }
+
+            update() {
+                const floorY = canvas.height - 100 - this.height;
+                const moveLeft = keys['KeyA'] || keys['ArrowLeft'] || touchBtns.left;
+                const moveRight = keys['KeyD'] || keys['ArrowRight'] || touchBtns.right;
+
+                if (moveLeft) this.x -= 4.8;
+                if (moveRight) this.x += 4.8;
+                this.x = Math.max(40, Math.min(canvas.width - 250, this.x));
+
+                const shootKey = keys['Space'] || keys['KeyW'] || keys['ArrowUp'] || touchBtns.action;
+
+                if (shootKey && this.hasBall) {
+                    this.meterCharging = true;
+                    this.shotMeter = Math.min(1, this.shotMeter + 0.025);
+                    if (!this.isJumping) {
+                        this.vy = -12.5;
+                        this.isJumping = true;
+                    }
+                } else if (!shootKey && this.meterCharging && this.hasBall) {
+                    this.shootBall();
+                    this.meterCharging = false;
+                }
+
+                this.y += this.vy;
+                if (this.y < floorY) {
+                    this.vy += 0.6;
+                } else {
+                    this.y = floorY;
+                    this.vy = 0;
+                    this.isJumping = false;
+                }
+            }
+
+            shootBall() {
+                this.hasBall = false;
+                ball.x = this.x + 15;
+                ball.y = this.y + 10;
+
+                const targetX = canvas.width - 120;
+                const isPerfect = this.shotMeter >= 0.82 && this.shotMeter <= 0.96;
+                let powerMultiplier = this.shotMeter / 0.9;
+                if (isPerfect) powerMultiplier = 1.0;
+
+                const dx = targetX - ball.x;
+                const arcHeight = 220 * powerMultiplier;
+
+                ball.vx = (dx / 42) * (isPerfect ? 1.0 : (0.85 + Math.random() * 0.3));
+                ball.vy = -Math.sqrt(2 * 0.45 * arcHeight);
+                ball.isAirborne = true;
+                this.shotMeter = 0;
+            }
+
+            draw() {
+                ctx.fillStyle = 'rgba(0,0,0,0.3)';
+                ctx.beginPath();
+                ctx.ellipse(this.x + 15, canvas.height - 100, 20, 6, 0, 0, Math.PI * 2);
+                ctx.fill();
+
+                ctx.fillStyle = '#1e293b';
+                ctx.fillRect(this.x + 5, this.y + 45, 8, 25);
+                ctx.fillRect(this.x + 17, this.y + 45, 8, 25);
+
+                ctx.fillStyle = '#f97316';
+                ctx.fillRect(this.x + 3, this.y + 20, 24, 28);
+
+                ctx.fillStyle = '#ffffff';
+                ctx.font = 'bold 12px sans-serif';
+                ctx.fillText('23', this.x + 9, this.y + 38);
+
+                ctx.fillStyle = '#fca5a5';
+                ctx.beginPath();
+                ctx.arc(this.x + 15, this.y + 12, 10, 0, Math.PI * 2);
+                ctx.fill();
+
+                if (this.hasBall) {
+                    ball.x = this.x + 15;
+                    ball.y = this.y + 10;
+                    ball.draw();
+                }
+
+                if (this.meterCharging) {
+                    const mw = 44;
+                    const mh = 8;
+                    const mx = this.x - 7;
+                    const my = this.y - 22;
+
+                    ctx.fillStyle = 'rgba(0,0,0,0.7)';
+                    ctx.fillRect(mx - 2, my - 2, mw + 4, mh + 4);
+                    ctx.fillStyle = '#ef4444';
+                    ctx.fillRect(mx, my, mw, mh);
+                    ctx.fillStyle = '#10b981';
+                    ctx.fillRect(mx + (mw * 0.82), my, mw * 0.14, mh);
+                    ctx.fillStyle = '#ffffff';
+                    ctx.fillRect(mx + (mw * this.shotMeter) - 1, my - 2, 3, mh + 4);
+                }
+            }
+        }
+
+        class Basketball {
+            constructor() {
+                this.x = 0;
+                this.y = 0;
+                this.radius = 11;
+                this.vx = 0;
+                this.vy = 0;
+                this.isAirborne = false;
+            }
+
+            update() {
+                if (!this.isAirborne) return;
+
+                this.x += this.vx;
+                this.y += this.vy;
+                this.vy += 0.45;
+
+                const floorY = canvas.height - 100 - this.radius;
+                const hoopX = canvas.width - 120;
+                const hoopY = 180;
+                const rimLeftX = hoopX - 22;
+                const rimRightX = hoopX + 22;
+
+                if (this.vy > 0 && Math.abs(this.x - hoopX) < 18 && Math.abs(this.y - hoopY) < 10) {
+                    this.scoreBasket();
+                }
+
+                if (Math.hypot(this.x - rimLeftX, this.y - hoopY) < this.radius + 4 ||
+                    Math.hypot(this.x - rimRightX, this.y - hoopY) < this.radius + 4) {
+                    this.vx *= -0.5;
+                    this.vy *= -0.6;
+                    audio.playRim();
+                }
+
+                if (this.y >= floorY) {
+                    this.y = floorY;
+                    this.vy *= -0.6;
+                    this.vx *= 0.8;
+                    if (Math.abs(this.vy) > 1) audio.playBounce();
+                }
+            }
+
+            scoreBasket() {
+                audio.playSwish();
+                audio.playScore();
+                
+                let points = (player.x < canvas.width - 400) ? 3 : 2;
+                bbState.score += points;
+
+                if (bbState.score > bbState.highScore) {
+                    bbState.highScore = bbState.score;
+                    localStorage.setItem('brentan_bb_high', bbState.highScore);
+                    document.getElementById('bb-highscore').innerText = String(bbState.highScore).padStart(2, '0');
+                }
+                document.getElementById('bb-score').innerText = String(bbState.score).padStart(2, '0');
+
+                setTimeout(() => player.reset(player.x), 700);
+            }
+
+            draw() {
+                ctx.save();
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
+                ctx.fillStyle = '#ea580c';
+                ctx.fill();
+                ctx.lineWidth = 2;
+                ctx.strokeStyle = '#000000';
+                ctx.stroke();
+
+                ctx.beginPath();
+                ctx.moveTo(this.x - this.radius, this.y);
+                ctx.lineTo(this.x + this.radius, this.y);
+                ctx.moveTo(this.x, this.y - this.radius);
+                ctx.lineTo(this.x, this.y + this.radius);
+                ctx.strokeStyle = 'rgba(0,0,0,0.6)';
+                ctx.lineWidth = 1.5;
+                ctx.stroke();
+                ctx.restore();
+            }
+        }
+
+        const player = new BasketballPlayer();
+        const ball = new Basketball();
+
+        function resetBBBall() { player.reset(player.x); }
+
+        function setBBMode(m) {
+            bbState.mode = m;
+            bbState.score = 0;
+            document.getElementById('bb-score').innerText = '00';
+            ['practice', '3point'].forEach(mode => {
+                const btn = document.getElementById(`bb-mode-${mode}`);
+                if (btn) {
+                    if (mode === m) btn.className = 'px-3 py-1 rounded-lg border border-cyan-400 bg-cyan-500/20 text-cyan-400 font-bold';
+                    else btn.className = 'px-3 py-1 rounded-lg border border-slate-800 bg-slate-950 text-slate-400 font-bold hover:border-slate-700';
+                }
+            });
+            player.reset(120);
+        }
+
+        function drawCourt() {
+            const floorY = canvas.height - 100;
+            ctx.fillStyle = '#0b1120';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            ctx.fillStyle = '#1e293b';
+            ctx.fillRect(0, floorY, canvas.width, 100);
+            ctx.fillStyle = '#00d2ff';
+            ctx.fillRect(0, floorY, canvas.width, 4);
+
+            const hoopX = canvas.width - 120;
+            const hoopY = 180;
+
+            ctx.fillStyle = '#475569';
+            ctx.fillRect(hoopX + 35, hoopY - 40, 10, floorY - hoopY + 40);
+
+            ctx.fillStyle = '#ffffff';
+            ctx.fillRect(hoopX + 20, hoopY - 60, 15, 80);
+
+            ctx.fillStyle = '#ea580c';
+            ctx.fillRect(hoopX - 25, hoopY, 45, 6);
+
+            ctx.strokeStyle = 'rgba(255,255,255,0.7)';
+            ctx.lineWidth = 1;
+            ctx.beginPath();
+            ctx.moveTo(hoopX - 22, hoopY + 6);
+            ctx.lineTo(hoopX - 12, hoopY + 35);
+            ctx.lineTo(hoopX + 12, hoopY + 35);
+            ctx.lineTo(hoopX + 22, hoopY + 6);
+            ctx.stroke();
+        }
+
+        let spaceState = { x: 200, y: 200, score: 0, asteroids: [] };
+        let retroState = { qbX: 100, ballX: 0, ballY: 0, isPassing: false, targetY: 200, score: 0 };
+        let penaltyState = { meter: 0, meterDir: 1, isKicked: false, ballX: 0, ballY: 0, keeperX: 0, score: 0 };
+
+        function renderSpaceDodge() {
+            ctx.fillStyle = '#090d16';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            const speed = 4;
+            if (keys['KeyA'] || keys['ArrowLeft'] || touchBtns.left) spaceState.x -= speed;
+            if (keys['KeyD'] || keys['ArrowRight'] || touchBtns.right) spaceState.x += speed;
+            if (keys['KeyW'] || keys['ArrowUp'] || touchBtns.action) spaceState.y -= speed;
+            if (keys['KeyS'] || keys['ArrowDown']) spaceState.y += speed;
+
+            spaceState.x = Math.max(30, Math.min(canvas.width - 30, spaceState.x));
+            spaceState.y = Math.max(30, Math.min(canvas.height - 30, spaceState.y));
+
+            // Asteroid Spawning
+            if (Math.random() < 0.05) {
+                spaceState.asteroids.push({
+                    x: canvas.width + 30,
+                    y: Math.random() * canvas.height,
+                    radius: 15 + Math.random() * 20,
+                    speed: 3 + Math.random() * 4
+                });
+            }
+
+            for (let i = spaceState.asteroids.length - 1; i >= 0; i--) {
+                let ast = spaceState.asteroids[i];
+                ast.x -= ast.speed;
+
+                ctx.fillStyle = '#64748b';
+                ctx.beginPath();
+                ctx.arc(ast.x, ast.y, ast.radius, 0, Math.PI * 2);
+                ctx.fill();
+
+                if (Math.hypot(ast.x - spaceState.x, ast.y - spaceState.y) < ast.radius + 15) {
+                    spaceState.score = 0;
+                    spaceState.asteroids = [];
+                    audio.playRim();
+                    break;
+                }
+
+                if (ast.x < -30) spaceState.asteroids.splice(i, 1);
+            }
+
+            // Spaceship
+            ctx.fillStyle = '#00d2ff';
+            ctx.beginPath();
+            ctx.moveTo(spaceState.x + 20, spaceState.y);
+            ctx.lineTo(spaceState.x - 15, spaceState.y - 12);
+            ctx.lineTo(spaceState.x - 15, spaceState.y + 12);
+            ctx.closePath();
+            ctx.fill();
+
+            spaceState.score++;
+            ctx.fillStyle = '#ffffff';
+            ctx.font = 'bold 20px Fredoka';
+            ctx.fillText(`SPACE DISTANCE: ${spaceState.score}m`, 20, 35);
+        }
+
+        function renderRetroBowl() {
+            ctx.fillStyle = '#15803d';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            // Field Yard Lines
+            ctx.strokeStyle = 'rgba(255,255,255,0.4)';
+            ctx.lineWidth = 2;
+            for (let x = 0; x < canvas.width; x += 80) {
+                ctx.beginPath();
+                ctx.moveTo(x, 0);
+                ctx.lineTo(x, canvas.height);
+                ctx.stroke();
+            }
+
+            // Wide Receiver moving up and down
+            retroState.targetY += (Math.sin(Date.now() / 400) * 3);
+
+            // Quarterback
+            ctx.fillStyle = '#3b82f6';
+            ctx.beginPath();
+            ctx.arc(retroState.qbX, canvas.height / 2, 16, 0, Math.PI * 2);
+            ctx.fill();
+
+            // Target Receiver
+            ctx.fillStyle = '#ef4444';
+            ctx.beginPath();
+            ctx.arc(canvas.width - 120, retroState.targetY, 14, 0, Math.PI * 2);
+            ctx.fill();
+
+            if (keys['Space'] || touchBtns.action) {
+                if (!retroState.isPassing) {
+                    retroState.isPassing = true;
+                    retroState.ballX = retroState.qbX;
+                    retroState.ballY = canvas.height / 2;
+                }
+            }
+
+            if (retroState.isPassing) {
+                retroState.ballX += 8;
+                retroState.ballY += (retroState.targetY - retroState.ballY) * 0.05;
+
+                ctx.fillStyle = '#78350f';
+                ctx.beginPath();
+                ctx.ellipse(retroState.ballX, retroState.ballY, 10, 6, 0, 0, Math.PI * 2);
+                ctx.fill();
+
+                if (Math.hypot(retroState.ballX - (canvas.width - 120), retroState.ballY - retroState.targetY) < 20) {
+                    retroState.score += 6;
+                    retroState.isPassing = false;
+                    audio.playScore();
+                } else if (retroState.ballX > canvas.width) {
+                    retroState.isPassing = false;
+                }
+            }
+
+            ctx.fillStyle = '#ffffff';
+            ctx.font = 'bold 20px Fredoka';
+            ctx.fillText(`TOUCHDOWNS SCORE: ${retroState.score}`, 20, 35);
+        }
+
+        function renderPenaltyShootout() {
+            ctx.fillStyle = '#166534';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            // Goal Net Structure
+            const netX = canvas.width / 2 - 120;
+            ctx.strokeStyle = '#ffffff';
+            ctx.lineWidth = 4;
+            ctx.strokeRect(netX, 80, 240, 100);
+
+            // Aiming Meter
+            penaltyState.meter += penaltyState.meterDir * 0.03;
+            if (penaltyState.meter > 1 || penaltyState.meter < 0) penaltyState.meterDir *= -1;
+
+            const aimX = netX + (240 * penaltyState.meter);
+
+            ctx.fillStyle = '#facc15';
+            ctx.fillRect(aimX - 5, 185, 10, 15);
+
+            if ((keys['Space'] || touchBtns.action) && !penaltyState.isKicked) {
+                penaltyState.isKicked = true;
+                penaltyState.ballX = canvas.width / 2;
+                penaltyState.ballY = canvas.height - 80;
+                penaltyState.keeperX = netX + 40 + Math.random() * 160;
+            }
+
+            if (penaltyState.isKicked) {
+                penaltyState.ballX += (aimX - penaltyState.ballX) * 0.1;
+                penaltyState.ballY += (130 - penaltyState.ballY) * 0.1;
+
+                if (Math.hypot(penaltyState.ballX - aimX, penaltyState.ballY - 130) < 10) {
+                    if (Math.abs(penaltyState.ballX - penaltyState.keeperX) < 30) {
+                        // Saved
+                        audio.playRim();
+                    } else {
+                        // Goal
+                        penaltyState.score++;
+                        audio.playScore();
+                    }
+                    setTimeout(() => { penaltyState.isKicked = false; }, 800);
+                }
+            }
+
+            // Ball
+            ctx.fillStyle = '#ffffff';
+            ctx.beginPath();
+            ctx.arc(penaltyState.isKicked ? penaltyState.ballX : canvas.width / 2, penaltyState.isKicked ? penaltyState.ballY : canvas.height - 80, 12, 0, Math.PI * 2);
+            ctx.fill();
+
+            // Goalkeeper
+            ctx.fillStyle = '#ec4899';
+            ctx.fillRect((penaltyState.isKicked ? penaltyState.keeperX : canvas.width / 2) - 15, 120, 30, 45);
+
+            ctx.fillStyle = '#ffffff';
+            ctx.font = 'bold 20px Fredoka';
+            ctx.fillText(`GOALS SCORED: ${penaltyState.score}`, 20, 35);
+        }
+
+        function startGameInstance() {
+            document.getElementById('game-start-overlay').classList.add('hidden');
+            gameInstanceRunning = true;
+            if (currentGameId === 'basketball-stars') player.reset(150);
+            if (currentGameId === 'space-dodge') spaceState = { x: 200, y: 200, score: 0, asteroids: [] };
+            if (currentGameId === 'retro-bowl') retroState = { qbX: 100, ballX: 0, ballY: 0, isPassing: false, targetY: 200, score: 0 };
+            if (currentGameId === 'penalty-shootout') penaltyState = { meter: 0, meterDir: 1, isKicked: false, ballX: 0, ballY: 0, keeperX: 0, score: 0 };
+        }
+
+        function mainLoop() {
+            if (gameInstanceRunning) {
+                if (currentGameId === 'basketball-stars') {
+                    drawCourt();
+                    player.update();
+                    player.draw();
+                    ball.update();
+                    if (ball.isAirborne) ball.draw();
+                } else if (currentGameId === 'space-dodge') {
+                    renderSpaceDodge();
+                } else if (currentGameId === 'retro-bowl') {
+                    renderRetroBowl();
+                } else if (currentGameId === 'penalty-shootout') {
+                    renderPenaltyShootout();
+                } else {
+                    drawCourt();
+                    player.update();
+                    player.draw();
+                    ball.update();
+                    if (ball.isAirborne) ball.draw();
+                }
+            }
+            requestAnimationFrame(mainLoop);
+        }
+
+        window.onload = () => {
+            renderCatalog(pokiGamesDatabase);
+            mainLoop();
+        };
+    </script>
+</body>
+</html>
